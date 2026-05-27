@@ -1,0 +1,64 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env file from secrets
+        run: |
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "NODE_ENV=development" >> .env
+
+      - name: Build Docker images
+        run: docker compose build
+
+      - name: Start containers
+        run: docker compose up -d
+
+      - name: Wait for backend to be ready
+        run: |
+          echo "Waiting for backend..."
+          for i in $(seq 1 15); do
+            if curl -s http://localhost:5001/api/health > /dev/null; then
+              echo "Backend is ready"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 3s..."
+            sleep 3
+          done
+          echo "Backend never became ready"
+          exit 1
+
+      - name: Run health check
+        run: |
+          RESPONSE=$(curl -s http://localhost:5001/api/health)
+          echo "Health check response: $RESPONSE"
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:5001/api/health)
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check failed"
+            exit 1
+          fi
+          echo "Health check passed"
+
+      - name: Print logs if failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down
