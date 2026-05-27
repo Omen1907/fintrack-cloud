@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment variables
+.env
+
+# Vite build files
+dist/
+
+# Logs
+*.log
+
+# System files
+.DS_Store
