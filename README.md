@@ -19,3 +19,4 @@ This app is deployed on Microsoft Azure using:
 - **Azure Database for PostgreSQL** — managed cloud database
 
 ### Architecture
+GitHub Push ↓ GitHub Actions (CI) — builds and tests Docker images ↓ Azure Container Registry — stores images ↓ Azure Container Apps — runs frontend + backend ↓ Azure PostgreSQL — managed database
