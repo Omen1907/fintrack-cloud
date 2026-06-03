@@ -46,7 +46,6 @@ A full-stack personal finance tracking app containerized with Docker and deploye
 
 ## Project Structure
 
-```
 finance-tracker/
 ├── client/                        # React frontend
 │   ├── src/
@@ -75,7 +74,6 @@ finance-tracker/
 ├── .env                           # Never commit this
 ├── .env.example                   # Commit this instead
 └── .gitignore
-```
 
 ---
 
