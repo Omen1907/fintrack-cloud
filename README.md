@@ -46,7 +46,7 @@ A full-stack personal finance tracking app containerized with Docker and deploye
 
 ## Project Structure
 
-```
+```text
 finance-tracker/
 ├── client/                        # React frontend
 │   ├── src/
